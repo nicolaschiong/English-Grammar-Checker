@@ -1,0 +1,122 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;}PARSER_BEGIN(MyNewGrammar )
+public class MyNewGrammar{  public static void main(String args []) throws ParseException  {    MyNewGrammar parser = new MyNewGrammar(System.in);    while (true)    {      System.out.println("Grammar Checker");      System.out.print("Enter an sentence or phrase, must be TREEBANK TAGGED: ");      try      {        switch (MyNewGrammar.start())        {          case 0 :           System.out.println("\n\nThis is gramatically correct.\n\n");          break;          case 1 :           System.out.println("Goodbye.");          break;          default :           break;        }      }      catch (Exception e)      {        System.out.println("NOK.");        System.out.println(e.getMessage());        MyNewGrammar.ReInit(System.in);      }      catch (Error e)      {        System.out.println("Oops.");        System.out.println(e.getMessage());        break;      }    }  }}PARSER_END(MyNewGrammar)SKIP :{  " "| "\r"| "\t"| "\n"}
+TOKEN :
+{ < WORD: ["a"-"z","A"-"Z"] ( ["a"-"z","A"-"Z","0"-"9"] )* >
+| < NUM: ( ["0"-"9"] )+ >
+}
+
+TOKEN :
+{
+  < CONSTANT : (< DIGIT >)+ >
+| < #DIGIT : [ "0"-"9" ] >
+}
+
+TOKEN : /* TREE BANK POS */
+{
+  < COORDINATING_CONJUNCTION :  (< WORD >"/CC") >
+| < CARDINAL : (< WORD >"/CD" )>
+| < DETERMINER : (< WORD >"/DT") >
+| < EXISTENTIAL_THERE : (< WORD >"/EX") >
+| < FOREIGN_WORD : (< WORD >"/FW") >
+| < CONJUNCTION: (< WORD >"/IN") >
+| < ADJECTIVE : (< WORD >"/JJ") >
+| < ADJECTIVE_COMPARATIVE : (< WORD >"/JJR") >
+| < ADJECTIVE_SUPERLATIVE : (< WORD >"/JJS") >
+| < LIST_ITEM_MARKER : (< WORD >"/LS") >
+| < VERB_MODAL_AUXILLIARY : (< WORD >"/MD") >
+| < NOUN_SINGULAR : (< WORD >"/NN") >
+| < NOUN_PLURAL : (< WORD >"/NNS") >
+| < NOUN_PROPER_SINGULAR : (< WORD >"/NNP") >
+| < NOUN_PROPER_PLURAL : (< WORD >"/NNPS") >
+| < PREDETERMINER : (< WORD >"/PDT") >
+| < POSSESSIVE_ENDING : (< WORD >"/POS") >
+| < PRONOUN_PERSONAL : (< WORD >"/PRP") >
+| < PRONOUN_POSSESSIVE :(< WORD >"/PRP$") >
+| < ADVERB : (< WORD >"/RB") >
+| < ADVERB_COMPARATIVE : (< WORD >"/RBR") >
+| < ADVERB_SUPERLATIVE : (< WORD >"/RBS") >
+| < ADBERB_PARTICIPLE : (< WORD >"/RP") >
+| < SYMBOL : (< WORD >"/SYM") >
+| < INFINITVAL_TO : (< WORD >"/TO") >
+| < INTERJECTION: (< WORD >"/UH") >
+| < VERB_BASE : (< WORD >"/VB") >
+| < VERB_3RD_PERSON_SINGULAR_PRESENT : (< WORD >"/VBZ") >
+| < VERB_PAST_TENSE: (< WORD >"/VBD") >
+| < VERB_PAST_PARTICIPLE: (< WORD >"/VBN") >
+| < VERB_PRESENT_PARTICIPLE : (< WORD >"/VBG") >
+| < WH_DETERMINER : (< WORD >"/WDT") >
+| < WH_PRONOUN_PERSONAL : (< WORD >"/WP") >
+| < WH_PRONOUN_POSSESSIVE : (< WORD >"/WP$") >
+| < WH_ADVERB : (< WORD >"WRB") >}
+
+TOKEN: /*SPECIAL CHARS */
+{
+  < PUNCTUATION_MARK_SENTENCE_CLOSER : "." >
+| < PUNCTUATION_MARK_COMMA : "," >
+| < PUNCTUATION_MARK_COLON : ";" >
+| < CONTEXTUAL_SEPARATON_LEFT_PAREN : "(" >
+| < CONTEXTUAL_SEPARATON_RIGHT_PAREN : ")" >}
+TOKEN : /* OPERATORS */{  < PLUS : "+" >| < MINUS : "-" >| < MULTIPLY : "*" >| < DIVIDE : "/" >}
+
+int start() :{}{  sentence()[<COORDINATING_CONJUNCTION > sentence()] ";"  {    return 0;  }| ";"  {    return 1;  }}void sentence() :{}{
+ 	[<VERB_MODAL_AUXILLIARY >]noun_phrase()[<COORDINATING_CONJUNCTION > noun_phrase() ] verb_phrase()[<COORDINATING_CONJUNCTION > verb_phrase() ]
+| verb_phrase()[<COORDINATING_CONJUNCTION > verb_phrase() ]}
+void noun_phrase():
+{System.out.print("\n(NOUN PHRASE \n\t");}
+{
+  [determiner() ][adjectives()]nouns()[prepositional_phrase()]
+}
+
+void verb_phrase():
+{System.out.print("\n(VERB PHRASE \n\t");}
+{
+ verbs() [noun_phrase() ][prepositional_phrase() ][adverb() ]
+}
+
+void prepositional_phrase(): { }
+{
+	< CONJUNCTION > [noun_phrase() ]
+}
+
+void nouns(): {
+  Token t; }
+{
+  t=< NOUN_SINGULAR >{ System.out.print("(SINGULAR NOUN " +t.image);}
+| t=< NOUN_PLURAL >{ System.out.print("(PLURAL NOUN " +t.image);}
+| t=< NOUN_PROPER_SINGULAR >{ System.out.print("(PROPER SINGULAR NOUN " +t.image);}
+| t=< NOUN_PROPER_PLURAL >{ System.out.print("(PROPER PLURAL NOUN " +t.image);}
+}
+
+void adjectives(): { Token t;}
+{
+  t=< ADJECTIVE >{ System.out.print("(ADJECTIVE " +t.image);}
+| t=< ADJECTIVE_COMPARATIVE >{ System.out.print("(COMPARATIVE ADJECTIVE " +t.image);}
+| t=< ADJECTIVE_SUPERLATIVE >{ System.out.print("(SUPERLATIVE ADJECTIVE " +t.image);}
+}
+
+void verbs(): { Token t;}
+{
+  t=< VERB_BASE >{ System.out.print("(VERB BASE " +t.image);}
+| t=< VERB_3RD_PERSON_SINGULAR_PRESENT >{ System.out.print("(VERB SINGULAR PRESENT " +t.image);}
+| t=< VERB_PAST_TENSE >{System.out.print("(VERB PAST TENSE ");}
+| t=< VERB_PAST_PARTICIPLE >{ System.out.print("(VERB PAST PARTICIPLE " +t.image);}
+| t=< VERB_PRESENT_PARTICIPLE >{ System.out.print("(VERB PRESENT PARTICIPLE " +t.image);}
+| t=< VERB_MODAL_AUXILLIARY >{ System.out.print("(VERB MODAL AUX " +t.image);}
+   }
+
+void adverb(): { Token t;}
+{
+  t=< ADVERB  >{ System.out.print("(ADVERB" +t.image);}
+| t=< ADVERB_COMPARATIVE >{ System.out.print("(ADVERB COMPARATIVE " +t.image);}
+| t=< ADVERB_SUPERLATIVE >{ System.out.print("(ADVERB SUPERLATIVE " +t.image);}
+| t=< ADBERB_PARTICIPLE  >{ System.out.print("(ADVERB PARTICIPLE " +t.image);}
+}
+
+void determiner(): {Token t;  }
+{
+  t=< DETERMINER >{System.out.print("(DETERMINER " +t.image);}
+}
+
+
